@@ -1,0 +1,154 @@
+---
+title: "NHIS Data 2020-2021 (Anxiety & Depression)"
+author: "CJ Paine"
+date: "2022-09-21"
+output: html_document
+---
+
+```{r}
+
+```
+
+
+## R Markdown
+
+This is an R Markdown document following the steps I took to explore NHIS (National Health Interview Survey) data from [2020](https://www.cdc.gov/nchs/nhis/2020nhis.htm) and [2021](https://www.cdc.gov/nchs/nhis/2021nhis.htm), where I specifically look at data pertaining to the rate of diagnosed anxiety and depression among adults in the United States. 
+
+```{r}
+library(tidyverse)
+adult2020 <- read_csv("adult20.csv")
+adult2021 <- read_csv("adult21.csv")
+```
+
+
+### Cleaning the Data
+
+```{r}
+
+index <- is.na(adult2020)
+adult2020[index] <- 0
+index2 <- is.na(adult2021)
+adult2021[index2] <- 0
+
+adult2020 <- adult2020 %>% 
+  select(ANXEV_A, DEPEV_A)
+adult2021 <- adult2021 %>% 
+  select(ANXEV_A, DEPEV_A)
+
+```
+
+
+---
+
+
+
+
+#### Tables for 2020 Data
+
+After cleaning my data and sorting columns, I create tables to explore the 
+2020 data.
+
+This first table shows results for the question, "Have you EVER been told by a
+doctor or other health professional that you had any type of anxiety disorder?"
+
+
+```{r}
+
+anxtable1<- adult2020 %>% 
+  count(ANXEV_A)
+vec1 <- c('Yes', 'No', 'Refused', 'Dont Know')
+anxtable1 <- cbind(anxtable1, vec1)
+anxtable1 <- anxtable1 %>% 
+  mutate('Percent'=(n/31568)*100) %>%
+  set_names(c('Code','Results','Description', 'Percent'))
+print(anxtable1)
+
+
+
+
+
+```
+This second table shows results for the question, "Have you EVER been told by a doctor or other health professional that you had any type of depression?"
+
+```{r}
+deptable1 <- adult2020 %>% 
+  count(DEPEV_A)
+deptable1 <- cbind(deptable1, vec1)
+deptable1 <- deptable1 %>% 
+  mutate('Percent'=(n/31568)*100) %>%
+  set_names(c('Code','Results','Description', 'Percent'))
+print(deptable1)
+```
+
+
+---
+
+#### Tables for 2021 Data
+
+This first table shows results for the question, "Have you EVER been told by a
+doctor or other health professional that you had any type of anxiety disorder?"
+
+```{r}
+anxtable2<- adult2021 %>% 
+  count(ANXEV_A)
+vec1 <- c('Yes', 'No', 'Refused', 'Dont Know')
+anxtable2 <- cbind(anxtable2, vec1)
+anxtable2 <- anxtable2 %>% 
+  mutate('Percent'=(n/29482)*100) %>%
+  set_names(c('Code','Results','Description', 'Percent'))
+print(anxtable2)
+```
+
+This second table shows results for the question, "Have you EVER been told by a doctor or other health professional that you had any type of depression?"
+
+```{r}
+deptable2 <- adult2021 %>% 
+  count(DEPEV_A)
+head(deptable2)
+deptable2 <- cbind(deptable2, vec1)
+deptable2 <- deptable2 %>% 
+  mutate('Percent'=(n/29482)*100) %>%
+  set_names(c('Code','Results','Description', 'Percent'))
+print(deptable2)
+```
+
+---
+
+#### Creating a Data Frame for Visual
+
+Now that we have found the information we need to build a visual, let's first build the data frame for our visual.
+
+```{r}
+vec3 = c('2020', '2021')
+vec4 = c('15.52', '16.48')
+vec5 = c('17.48', '18.20')
+dataframe1 <- data.frame(vec3, vec4, vec5)
+colnames(dataframe1)<-c('Year', 'PercAnx', 'PercDepr')
+print(dataframe1)
+```
+
+## Visuals
+
+```{r}
+dataframe1 %>% 
+  ggplot()+ geom_bar(stat='identity',mapping=aes(x=Year,fill=Year,y=PercAnx))+
+  labs(title = "Percent of Population with Diagnosed Anxiety")+
+  xlab("Year")+
+  ylab("Percent")
+
+```
+*Source: National Health Interview Survey*
+```{r}
+dataframe1 %>% 
+  ggplot()+ geom_bar(stat='identity',mapping=aes(x=Year,fill=Year,y=PercDepr))+
+  labs(title = "Percent of Population with Diagnosed Depression")+
+  xlab("Year")+
+  ylab("Percent")
+```
+*Source: National Health Interview Survey*
+
+---
+
+**In conclusion, it seems the percentage of the U.S. population with diagnosed anxiety and/or depression has grown from 2020 to 2021.** 
+
+
